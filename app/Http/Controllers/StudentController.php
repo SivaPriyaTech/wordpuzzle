@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Traits\PuzzleTraits;
 use Illuminate\Http\Request;
 use App\Models\Student;
 use App\Models\Games;
@@ -9,7 +9,7 @@ use App\Models\Games;
 class StudentController extends Controller
 {
     //
-
+    use PuzzleTraits;
     public function register(Request $request){
         $validated = $request -> validate([
             'name' => 'required|string ',
@@ -41,18 +41,7 @@ class StudentController extends Controller
         return redirect()->route('index');
     }
 
-    private function generatePuzzleString()
-    {
-        $letters = 'abcdefghijklmnopqrstuvwxyz';
-        $length = 14;
-        $string = '';
-
-        for ($i = 0; $i < $length; $i++) {
-            $string .= $letters[rand(0, 25)];
-        }
-
-        return $string;
-    }
+ 
 
     public function logout(Request $request)
     {

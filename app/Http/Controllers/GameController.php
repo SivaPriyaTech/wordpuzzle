@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 use GuzzleHttp\Client;
+use App\Traits\PuzzleTraits;
 use Illuminate\Http\Request;
 use App\Models\Games;
 use App\Models\Submissions;
 
 class GameController extends Controller
 {
+   use PuzzleTraits;
    public function submit(Request $request)
     {
         $wordsInput = $request->input('words');
@@ -32,7 +34,6 @@ class GameController extends Controller
                     $totalPoints += $points;
                     $usedLetters .= $word;
 
-                    // Save to submissions table
                     Submissions::create([
                         'game_id' => $gameId,
                         'word' => $word,
@@ -43,12 +44,10 @@ class GameController extends Controller
                     $validWords[] = $word;
                 }
             } catch (\Exception $e) {
-                // Invalid word - skip
                 continue;
             }
         }
 
-        // Update game record
         $game = Games::find($gameId);
         if ($game) {
             $remaining = str_split($game->remaining_letters);
@@ -65,26 +64,35 @@ class GameController extends Controller
             $game->save();
         }
 
-        return redirect()->back()->with('success', 'Words submitted: ' . implode(', ', $validWords));
-    }
+        $puzzleString = $this->generatePuzzleString();
 
-    function calculateGrade($score) {
-        if ($score >= 20) return 'A';
-        if ($score >= 15) return 'B';
-        if ($score >= 10) return 'C';
-        if ($score >= 5) return 'D';
-        return 'F';
+        $game = Games::create([
+            'student_id' =>  session('student_id'),
+            'puzzle_string' => $puzzleString,
+            'remaining_letters' => $puzzleString,
+            'score' => 0,
+            'is_finished' => false,
+        ]);
+
+        session([
+            'game_id' => $game->id,
+            'puzzle_string' => $puzzleString
+        ]);
+
+        return redirect()->back()->with('message', 'Words submitted: ' . implode(', ', $validWords) . 'Total points:' .$totalPoints, );
     }
 
     public function index()
     {
-        $games = Games::with(['student', 'submissions'])
-            ->orderByDesc('score')
-            ->take(10)
-            ->get();
+        $top = Submissions::select('word', 'points')
+        ->orderByDesc('points')
+        ->get()
+        ->unique('word')
+        ->take(10);
 
-        return view('index', compact('games'));
+        return view('index', compact('top'));
     }
+
 
 
 }

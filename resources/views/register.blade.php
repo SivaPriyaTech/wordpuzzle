@@ -8,14 +8,14 @@
 
         <!-- Student Name -->
         <div class="mb-3">
-        <label for="name" class="form-label">Full Name <span class="text-danger">*</span></label>
-        <input type="text" name="name" id="name" class="form-control" required placeholder="Enter your full name">
+            <label for="name" class="form-label">Full Name <span class="text-danger">*</span></label>
+            <input type="text" name="name" id="name" class="form-control" required placeholder="Enter your full name">
         </div>
 
         <!-- Email ID -->
         <div class="mb-3">
-        <label for="email" class="form-label">Email ID <span class="text-danger">*</span></label>
-        <input type="email" name="email" id="email" class="form-control" required placeholder="Enter your email">
+            <label for="email" class="form-label">Email ID <span class="text-danger">*</span></label>
+            <input type="email" name="email" id="email" class="form-control" required placeholder="Enter your email">
         </div>
 
         <button type="submit" class="btn btn-success w-100">Start Puzzle Game</button>

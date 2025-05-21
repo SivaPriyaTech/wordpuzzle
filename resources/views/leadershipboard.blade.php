@@ -7,20 +7,16 @@
         <thead>
             <tr>
                 <th>Rank</th>
-                <th>Player</th>
+                <th>Word</th>
                 <th>Score</th>
-                <th>Words Submitted</th>
             </tr>
         </thead>
         <tbody>
-            @foreach($games as $index => $game)
+            @foreach($top as $index => $word)
                 <tr>
                     <td>{{ $index + 1 }}</td>
-                    <td>{{ $game->student->name }}</td>
-                    <td>{{ $game->score }}</td>
-                    <td>
-                        {{ $game->submissions->pluck('word')->join(', ') }}
-                    </td>
+                    <td>{{ $word->word}}</td>
+                    <td>{{ $word->points }}</td>
                 </tr>
             @endforeach
         </tbody>
