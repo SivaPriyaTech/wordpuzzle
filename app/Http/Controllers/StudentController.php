@@ -8,7 +8,6 @@ use App\Models\Games;
 
 class StudentController extends Controller
 {
-    //
     use PuzzleTraits;
     public function register(Request $request){
         $validated = $request -> validate([
@@ -31,7 +30,6 @@ class StudentController extends Controller
             'is_finished' => false,
         ]);
 
-        // Store in session
         session([
             'student_id' => $student->id,
             'student_name' => $student->name,
@@ -45,7 +43,7 @@ class StudentController extends Controller
 
     public function logout(Request $request)
     {
-        session()->flush(); // Clears all session data
+        session()->flush(); 
         return redirect('/')->with('message', 'You have been logged out.');
     }
 }
