@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Models;
+use App\Models\Student;
+use App\Models\Submissions;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -25,6 +27,6 @@ class Games extends Model
 
     public function submissions()
     {
-        return $this->hasMany(Submission::class);
+        return $this->hasMany(Submissions::class, 'game_id');
     }
 }

@@ -16,18 +16,79 @@
 </div>
 
 @if (session()->has('puzzle_string'))
-    <div class="alert alert-dark">
-        <strong>Puzzle String:</strong> {{ session('puzzle_string') }}
+      <div class="alert alert-dark" id="puzzleStringDisplay">
+        <strong>Puzzle String:</strong> <span id="puzzleStringText">{{ session('puzzle_string') }}</span>
     </div>
 @endif
 
-<form method="POST" action="{{ route('submit.word') }}">
+<form method="POST" action="{{ route('submit.words') }}" id="wordsForm">
     @csrf
     <div class="form-group">
         <label for="words">Enter your words (separated by comma or space):</label>
         <input type="text" name="words" id="words" class="form-control" required>
     </div>
+    <div id="error-message" style="color: red; margin-top: 0.5rem;"></div>
     <button type="submit" class="btn btn-primary mt-2">Submit Words</button>
 </form>
 
+<script>
+    const originalPuzzle = @json(session('puzzle_string', '')).toLowerCase();
+    const puzzleDisplay = document.getElementById('puzzleStringDisplay');
+    const wordsInput = document.getElementById('words');
+    const errorMessageDiv = document.getElementById('error-message');
+    const form = document.getElementById('wordsForm');
 
+    function updatePuzzleStringDisplay() {
+        const inputText = wordsInput.value.toLowerCase();
+        const inputLetters = inputText.replace(/[\s,]+/g, '').split('');
+
+        let puzzleLetterCount = {};
+        for (const letter of originalPuzzle) {
+            puzzleLetterCount[letter] = (puzzleLetterCount[letter] || 0) + 1;
+        }
+
+        let inputLetterCount = {};
+        for (const letter of inputLetters) {
+            inputLetterCount[letter] = (inputLetterCount[letter] || 0) + 1;
+        }
+
+        let invalidLetters = [];
+        for (const letter in inputLetterCount) {
+            if (!puzzleLetterCount[letter] || inputLetterCount[letter] > puzzleLetterCount[letter]) {
+                invalidLetters.push(letter);
+            }
+        }
+
+        if (invalidLetters.length > 0) {
+            errorMessageDiv.textContent = `Please enter valid letters only. Invalid letter(s): ${invalidLetters.join(', ')}`;
+        } else {
+            errorMessageDiv.textContent = '';
+        }
+
+        let remainingLetters = '';
+        for (const letter in puzzleLetterCount) {
+            const countInPuzzle = puzzleLetterCount[letter];
+            const countUsed = inputLetterCount[letter] || 0;
+            const remainingCount = countInPuzzle - countUsed;
+            if (remainingCount > 0) {
+                remainingLetters += letter.repeat(remainingCount);
+            }
+        }
+
+        puzzleDisplay.textContent = remainingLetters;
+
+        // Return whether input is valid or not for form submit handler
+        return invalidLetters.length === 0;
+    }
+
+    wordsInput.addEventListener('input', updatePuzzleStringDisplay);
+
+    form.addEventListener('submit', function(e) {
+        if (!updatePuzzleStringDisplay()) {
+            e.preventDefault(); // Stop form submit
+            alert('Please fix errors before submitting.');
+        }
+    });
+
+    updatePuzzleStringDisplay();
+</script>

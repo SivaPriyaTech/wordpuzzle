@@ -13,10 +13,13 @@ class StudentController extends Controller
     public function register(Request $request){
         $validated = $request -> validate([
             'name' => 'required|string ',
-            'email' => 'required|email|unique:students,email'
+            'email' => 'required|email'
         ]);
 
-        $student = Student::create($validated);
+        $student = Student::firstOrCreate(
+            ['email' => $validated['email']],
+            ['name' => $validated['name']]
+        );
 
         $puzzleString = $this->generatePuzzleString();
 
@@ -49,5 +52,11 @@ class StudentController extends Controller
         }
 
         return $string;
+    }
+
+    public function logout(Request $request)
+    {
+        session()->flush(); // Clears all session data
+        return redirect('/')->with('message', 'You have been logged out.');
     }
 }
